@@ -23,6 +23,8 @@ Get started at [spinningup.openai.com](https://spinningup.openai.com)!
 
 This fork has been updated and tested to run successfully on **MacBooks with Apple Silicon (M1/M2 chips)**, including PPO training, policy evaluation, and plotting.
 
+For optional MuJoCo installation, refer to the MuJoCo branch’s installation instructions.
+
 ### 🔧 Installation Instructions (Tested on macOS)
 
 ```bash

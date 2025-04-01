@@ -6,6 +6,7 @@ import tensorflow as tf
 import torch
 from spinup import EpochLogger
 from spinup.utils.logx import restore_tf_graph
+import gymnasium as gym
 
 
 def load_policy_and_env(fpath, itr='last', deterministic=False):
@@ -55,15 +56,25 @@ def load_policy_and_env(fpath, itr='last', deterministic=False):
 
     # try to load environment from save
     # (sometimes this will fail because the environment could not be pickled)
-    try:
-        state = joblib.load(osp.join(fpath, 'vars'+itr+'.pkl'))
-        env_name = state.get('env_name', 'LunarLander-v2')
+    # try:
+    #     state = joblib.load(osp.join(fpath, 'vars'+itr+'.pkl'))
+    #     env_name = state.get('env_name', 'LunarLander-v2')
+    #     print(f"Recreating env '{env_name}' with render_mode='human'")
+    #     import gym
+    #     env = gym.make(env_name, render_mode='human')
+    # except Exception as e:
+    #     print(f"Failed to load or recreate env: {e}")
+    #     env = None
+    state = joblib.load(osp.join(fpath, 'vars'+itr+'.pkl'))
+    # env_name = state.get('env_name', 'Walker2d-v5')  # Force override here
+    # print(f"WARNING: env_name not found in vars.pkl, using fallback: {env_name}")
+    env_name = state.get('env_name')
+    if env_name is None:
+        env_name = 'LunarLander-v3'
+        print(f"WARNING: env_name not found in vars.pkl, using fallback: {env_name}")
+    else:
         print(f"Recreating env '{env_name}' with render_mode='human'")
-        import gym
-        env = gym.make(env_name, render_mode='human')
-    except Exception as e:
-        print(f"Failed to load or recreate env: {e}")
-        env = None
+    env = gym.make(env_name, render_mode='human')
 
     return env, get_action
 

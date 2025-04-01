@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch.optim import Adam
 import gym
+# import gymnasium as gym
 import time
 import spinup.algos.pytorch.ppo.core as core
 from spinup.utils.logx import EpochLogger
@@ -88,7 +89,7 @@ class PPOBuffer:
 def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0, 
         steps_per_epoch=4000, epochs=50, gamma=0.99, clip_ratio=0.2, pi_lr=3e-4,
         vf_lr=1e-3, train_pi_iters=80, train_v_iters=80, lam=0.97, max_ep_len=1000,
-        target_kl=0.01, logger_kwargs=dict(), save_freq=10):
+        target_kl=0.01, logger_kwargs=dict(), save_freq=10, env_name=None):
     """
     Proximal Policy Optimization (by clipping), 
 
@@ -197,7 +198,12 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # Set up logger and save configuration
     logger = EpochLogger(**logger_kwargs)
-    logger.save_config(locals())
+
+    # Inject env_name manually if it's in logger_kwargs
+    config = locals()
+    if env_name is not None:
+        config['env_name'] = env_name
+    logger.save_config(config)
 
     # Random seed
     seed += 10000 * proc_id()
@@ -299,6 +305,8 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     for epoch in range(epochs):
         for t in range(local_steps_per_epoch):
             a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
+            # a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32).unsqueeze(0))
+            # a, v, logp = a[0], v[0], logp[0]
 
             next_o, r, terminated, truncated, _ = env.step(a)
             d = terminated or truncated
@@ -334,7 +342,7 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
         # Save model
         if (epoch % save_freq == 0) or (epoch == epochs-1):
-            logger.save_state({'env': env}, None)
+            logger.save_state({'env': env, 'env_name': env_name}, None)
 
         # Perform PPO update!
         update()

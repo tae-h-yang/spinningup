@@ -3,6 +3,7 @@ from spinup.user_config import DEFAULT_DATA_DIR, FORCE_DATESTAMP, \
 from spinup.utils.logx import colorize
 from spinup.utils.mpi_tools import mpi_fork, msg
 from spinup.utils.serialization_utils import convert_json
+import gymnasium as gym
 import base64
 from copy import deepcopy
 import cloudpickle
@@ -150,13 +151,9 @@ def call_experiment(exp_name, thunk, seed=0, num_cpu=1, data_dir=None,
     def thunk_plus():
         # Make 'env_fn' from 'env_name'
         if 'env_name' in kwargs:
-            import gym
             env_name = kwargs['env_name']
             kwargs['env_fn'] = lambda : gym.make(env_name)
-            del kwargs['env_name']
-
-        # Fork into multiple processes
-        mpi_fork(num_cpu)
+            # del kwargs['env_name']
 
         # Run thunk
         thunk(**kwargs)
@@ -182,6 +179,7 @@ def call_experiment(exp_name, thunk, seed=0, num_cpu=1, data_dir=None,
             """) + '='*DIV_LINE_WIDTH + '\n'*3
         print(err_msg)
         raise
+    # thunk_plus()
 
     # Tell the user about where results are, and how to check them
     logger_kwargs = kwargs['logger_kwargs']

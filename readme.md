@@ -21,35 +21,57 @@ Get started at [spinningup.openai.com](https://spinningup.openai.com)!
 
 ## ✅ Apple Silicon (M1/M2) Compatibility Setup
 
-This fork has been updated and tested to run successfully on **MacBooks with Apple Silicon (M1/M2 chips)**, including PPO training, policy evaluation, and plotting.
+This fork has been updated and tested to run successfully on **MacBooks with Apple Silicon (M1/M2 chips)**, including PPO training, MuJoCo environments, policy evaluation, and plotting.
 
-### 🔧 Installation Instructions (Tested on macOS)
+### 🔧 Installation Instructions (Tested on macOS, with MuJoCo)
 
 ```bash
 # 1. Create environment
 conda create -n spinup python=3.8
 conda activate spinup
 
-# 2. Install updated dependencies
+# 2. Install core dependencies for Apple Silicon
 pip install tensorflow-macos
 pip install tensorflow-metal
-pip install box2d-py
-pip install "gym[classic_control]"
 
-# 3. Clone and prepare repo
+# 3. Install gymnasium and environments
+pip install gymnasium
+pip install "gymnasium[mujoco]"
+pip install "gymnasium[box2d]"
+
+# 4. Clone and prepare repo
 git clone https://github.com/tae-h-yang/spinningup.git
 cd spinningup
+git checkout mujoco
 brew install open-mpi
 
-# 4. Install the repo
+# 5. Install the repo
 pip install -e .
 ```
 
-> `setup.py` was updated to use modern, ARM-compatible versions of:
-> - `tensorflow` (via `tensorflow-macos`)
-> - `torch`
-> - `gym` (>= 0.26)
-> - `seaborn` (>= 0.11)
+> `setup.py` has been updated to support Apple Silicon by using:
+> - `tensorflow-macos` & `tensorflow-metal`
+> - `gymnasium` (instead of `gym`)
+> - `mujoco` (instead of `mujoco-py`)
+> - Compatible versions of `torch`, `seaborn`, and other libraries
+
+---
+
+### ✅ Check Your Install (MuJoCo + Box2D)
+
+```bash
+# Test Box2D (LunarLander-v3)
+python -m spinup.run ppo --hid "[32,32]" --env LunarLander-v3 --exp_name installtest --gamma 0.999
+python -m spinup.run test_policy data/installtest/installtest_s0
+python -m spinup.run plot data/installtest/installtest_s0
+
+# Test MuJoCo (Walker2d-v5)
+python -m spinup.run ppo --hid "[32,32]" --env Walker2d-v5 --exp_name mujocotest
+python -m spinup.run test_policy data/mujocotest/mujocotest_s0
+python -m spinup.run plot data/mujocotest/mujocotest_s0
+```
+
+✅ All tests should run successfully on M1/M2 MacBooks.
 
 ---
 

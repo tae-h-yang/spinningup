@@ -17,6 +17,41 @@ This module contains a variety of helpful resources, including:
 
 Get started at [spinningup.openai.com](https://spinningup.openai.com)!
 
+---
+
+## ✅ Apple Silicon (M1/M2) Compatibility Setup
+
+This fork has been updated and tested to run successfully on **MacBooks with Apple Silicon (M1/M2 chips)**, including PPO training, policy evaluation, and plotting.
+
+### 🔧 Installation Instructions (Tested on macOS)
+
+```bash
+# 1. Create environment
+conda create -n spinup python=3.8
+conda activate spinup
+
+# 2. Install updated dependencies
+pip install tensorflow-macos
+pip install tensorflow-metal
+pip install box2d-py
+pip install "gym[classic_control]"
+
+# 3. Clone and prepare repo
+git clone https://github.com/tae-h-yang/spinningup.git
+cd spinningup
+brew install open-mpi
+
+# 4. Install the repo
+pip install -e .
+```
+
+> `setup.py` was updated to use modern, ARM-compatible versions of:
+> - `tensorflow` (via `tensorflow-macos`)
+> - `torch`
+> - `gym` (>= 0.26)
+> - `seaborn` (>= 0.11)
+
+---
 
 Citing Spinning Up
 ------------------

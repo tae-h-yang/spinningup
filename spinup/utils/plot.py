@@ -30,7 +30,10 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet", condition="Condition1",
     if isinstance(data, list):
         data = pd.concat(data, ignore_index=True)
     sns.set(style="darkgrid", font_scale=1.5)
-    sns.tsplot(data=data, time=xaxis, value=value, unit="Unit", condition=condition, ci='sd', **kwargs)
+    import warnings
+    warnings.filterwarnings("ignore", category=UserWarning)
+
+    sns.lineplot(data=data, x=xaxis, y=value, hue=condition, errorbar='sd', **kwargs)
     """
     If you upgrade to any version of Seaborn greater than 0.8.1, switch from 
     tsplot to lineplot replacing L29 with:
